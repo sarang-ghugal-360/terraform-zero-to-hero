@@ -1,0 +1,45 @@
+name: DevOps CI/CD Pipeline
+
+on:
+push:
+branches: [ "main" ]
+
+jobs:
+build-and-deploy:
+runs-on: ubuntu-latest
+
+```
+steps:
+
+  # 1️⃣ Get Code
+  - name: Checkout Code
+    uses: actions/checkout@v3
+
+  # 2️⃣ Docker Build (Main Practice)
+  - name: Build Docker Image
+    run: docker build -t devops-ui .
+
+  # 3️⃣ Show Docker Images (for verification)
+  - name: List Docker Images
+    run: docker images
+
+  # 4️⃣ Setup Terraform
+  - name: Setup Terraform
+    uses: hashicorp/setup-terraform@v2
+
+  # 5️⃣ AWS Login
+  - name: Configure AWS Credentials
+    uses: aws-actions/configure-aws-credentials@v2
+    with:
+      aws-access-key-id: ${{ secrets.AWS_KEY }}
+      aws-secret-access-key: ${{ secrets.AWS_SECRET }}
+      aws-region: ap-south-1
+
+  # 6️⃣ Terraform Init
+  - name: Terraform Init
+    run: terraform init
+
+  # 7️⃣ Terraform Apply (Create EC2)
+  - name: Terraform Apply
+    run: terraform apply -auto-approve
+```
